@@ -1,0 +1,102 @@
+!!
+!! NATIVE PROTEIN DATA
+!!
+NATIVE_FILE                     {{ starting_file }}
+STRUCTURE_FILE                  {{ native_file }}
+NATIVE_DIRECTORY                {{ checkpoint_directory | default('None') }}
+TEMPLATE_FILE                   {{ template_file or native_file }}
+ALIGNMENT_FILE                  1lfb
+PDB_OUT_FILE                    {{ output_path }}
+PROTEIN_NAME                    p1afvA
+!!
+!!
+!! POTENTIAL PARAMETERS
+!!
+NO_NEW_CLASHES                  1
+READ_POTENTIAL                  1Lfb
+USE_GO_POTENTIAL                0
+CLASH_WEIGHT                    0
+RMS_WEIGHT                      0
+HYDROGEN_BOND                   -2
+NATIVE_ATTRACTION               0
+NON_NATIVE_REPULSION            0
+NON_SPECIFIC_ENERGY             0
+!!
+!! CONTACT DEFINITION
+!!
+SKIP_LOCAL_CONTACT_RANGE        4
+SKIP_BB_CONTACT_RANGE           1000
+!!
+!! MONTE-CARLO PARAMETERS
+!!
+!!
+MC_STEPS                        {{ montecarlo_steps }}
+MC_ANNEAL_STEPS                 200000000000000
+MC_PDB_PRINT_STEPS              {{ montecarlo_log_interval }}
+PRINT_PDB                       {{ montecarlo_pdb | default(1) }}
+MC_PRINT_STEPS                  {{ montecarlo_log_interval }}
+!!
+!! Replica Exchange Parameter
+!!
+MC_REPLICA_STEPS                {{ replica_exchange_steps }}
+MAX_EXCHANGE                    {{ max_exchange_pairs }}
+!!
+!! SIMULATION PARAMETERS
+!!
+MC_TEMP_MIN                     {{ min_temperature }}
+TEMP_STEP                       {{ temperature_spacing }}
+NODES_PER_TEMP                  {{ nodes_per_temperature }}
+ALPHA                           0.75
+LAMBDA                          1.8
+MC_STEP_SIZE                    2.0
+SIDECHAIN_MOVES                 1
+SIDECHAIN_NOISE                 10
+USE_GLOBAL_BB_MOVES             0
+YANG_MOVE                       0.5
+YANG_SCALE                      30
+USE_CLUSTER                     {{ use_cluster | default(0, true) }}
+MAX_CLUSTERSTEP                 {{ max_cluster_move_steps | default(0, true) }}
+USE_SIDECHAINS                  1
+USE_ROTAMERS                    1
+USE_ROT_PROB                    0
+SEQ_DEP_HB                      1
+
+{% if umbrella %}
+!!
+!! Umbrella parameters !!
+!!
+UMBRELLA                        1
+K_BIAS                          {{ umbrella_bias }}
+NUMBER_OF_CONTACTS_MAX          {{ umbrella_max }}
+CONTACTS_STEP                   {{ umbrella_spacing }}
+MIN_SEQ_SEP                     8
+CONTACT_CALPHA_CUTOFF           {{ contact_distance_cutoff }}
+{% endif %}
+
+{% if constraint %}
+!!
+!! Constraint parameters !!
+!!
+CONSTRAINT_FILE {{ conatraint_file }}
+K_CONSTRAINT    {{ k_constraint }}
+{% endif %}
+
+!! CONSTRAINT_RMSD is a new feature
+!!   MC simulation will not let RMSD exceed set value
+!!   A negative value means this feature is inactive
+CONSTRAINT_RMSD                 -1
+
+!!
+!! PARAMETER FILES
+!!
+TRIPLET_ENERGY_FILE             {{ protein_dependent_param }}.triple
+SIDECHAIN_TORSION_FILE          {{ protein_dependent_param }}.sctorsion
+SECONDARY_STRUCTURE_FILE        {{ protein_dependent_param }}.sec_str
+!!
+AMINO_DATA_FILE                 {{ mcpu_config_path }}/amino_torsion.data
+ROTAMER_DATA_FILE               {{ mcpu_config_path }}/bbind02.May.lib
+ATOM_TYPE_FILE                  {{ mcpu_config_path }}/twenty_res_typing
+HELICITY_DATA                   {{ mcpu_config_path }}/T0130.seq
+HYDROGEN_BONDING_DATA           {{ mcpu_config_path }}/hydrogen_jPL3h.data
+POTENTIAL_DATA                  {{ mcpu_config_path }}/p178_conrange4_potential_0.995054
+AROMATIC_FILE                   {{ mcpu_config_path }}/aromatic_noTYR.energy

@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH -N {{ nodes }}
+#SBATCH -c 1
+#SBATCH -n {{ number_of_replicas }}
+#SBATCH -p {{ partition }}
+#SBATCH -t {{ time }}
+#SBATCH --mem={{ memory }}
+#SBATCH -J {{ job_name }}
+#SBATCH -o {{ job_name }}_%j.out
+#SBATCH -e {{ job_name }}_%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user={{ email }}
+# This file can be anywhere, but the dir that contains the cfg file
+# must also have fold_potential_mpi. Then, the config_files dir should
+# be one level up from that one.
+
+module purge
+module load gcc/12.2.0-fasrc01 openmpi/4.1.4-fasrc01
+
+cd {{ working_directory }}
+srun -n ${SLURM_NTASKS} --mpi=pmi2 {{ mcpu_exec_path }} {{ config_path }}
